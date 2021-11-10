@@ -628,17 +628,9 @@ Transform:
   - {fileID: 1697981441}
   - {fileID: 1255343403}
   - {fileID: 1550492367}
-  - {fileID: 1904932026}
-  - {fileID: 1101234489}
-  - {fileID: 1922895637}
-  - {fileID: 1544815189}
-  - {fileID: 1959054994}
-  - {fileID: 925317494}
-  - {fileID: 425408388}
-  - {fileID: 915494412}
+  - {fileID: 1529524251}
   - {fileID: 1791870525}
   - {fileID: 919599690}
-  - {fileID: 1529524251}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1572,8 +1564,8 @@ Transform:
   - {fileID: 133567713}
   - {fileID: 250082964}
   - {fileID: 277728422}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 9
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &524558653
 GameObject:
@@ -2017,11 +2009,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2f4961b3c37e3a449fdf11b90872329, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _diamond: {fileID: 1550492367}
-  _frontdoor: {fileID: 1791870525}
-  _backdoor: {fileID: 919599690}
-  _van: {fileID: 1553827363}
+  _updateFrequency: 0.5
   _destReachBuffer: 2
+  _frontdoor: {fileID: 1791870527}
+  _backdoor: {fileID: 919599692}
+  _itemsToSteal:
+  - {fileID: 1904932026}
+  - {fileID: 1101234489}
+  - {fileID: 1922895637}
+  - {fileID: 1544815189}
+  - {fileID: 1959054994}
+  - {fileID: 925317494}
+  - {fileID: 425408388}
+  - {fileID: 915494412}
+  - {fileID: 2063104221}
+  _van: {fileID: 1553827363}
+  _money: 800
 --- !u!1 &716268924
 GameObject:
   m_ObjectHideFlags: 0
@@ -2588,14 +2591,14 @@ Transform:
   m_GameObject: {fileID: 915494408}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -9.61, y: 3.14, z: 18.52}
-  m_LocalScale: {x: 2.960816, y: 2.2560432, z: 1.3648999}
+  m_LocalScale: {x: 2.9608157, y: 2.2560432, z: 1.3648998}
   m_Children:
   - {fileID: 3044438}
   - {fileID: 1442085866}
   - {fileID: 381845543}
   - {fileID: 415012741}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 10
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &919599686
 GameObject:
@@ -2610,6 +2613,7 @@ GameObject:
   - component: {fileID: 919599688}
   - component: {fileID: 919599687}
   - component: {fileID: 919599691}
+  - component: {fileID: 919599692}
   m_Layer: 0
   m_Name: BackDoor
   m_TagString: Untagged
@@ -2691,7 +2695,7 @@ Transform:
   m_LocalScale: {x: 0.60116, y: 4.0211973, z: 4.160251}
   m_Children: []
   m_Father: {fileID: 237895145}
-  m_RootOrder: 12
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &919599691
 NavMeshObstacle:
@@ -2709,6 +2713,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &919599692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919599686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0c10ac6799f9aa40b7468b27da56d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isLocked: 0
 --- !u!1 &925317490
 GameObject:
   m_ObjectHideFlags: 0
@@ -2800,14 +2817,14 @@ Transform:
   m_GameObject: {fileID: 925317490}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -9.52, y: 3.14, z: 37.85}
-  m_LocalScale: {x: 2.960816, y: 2.2560432, z: 1.3648999}
+  m_LocalScale: {x: 2.9608157, y: 2.2560432, z: 1.3648998}
   m_Children:
   - {fileID: 949050340}
   - {fileID: 610103878}
   - {fileID: 311345813}
   - {fileID: 398602169}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 8
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &949050339
 GameObject:
@@ -3569,8 +3586,8 @@ Transform:
   - {fileID: 963338008}
   - {fileID: 1044379982}
   - {fileID: 1575733672}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 4
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1110814434
 GameObject:
@@ -4575,7 +4592,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1529524251}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Paintings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4591,9 +4608,17 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1904932026}
+  - {fileID: 1101234489}
+  - {fileID: 1922895637}
+  - {fileID: 1544815189}
+  - {fileID: 1959054994}
+  - {fileID: 925317494}
+  - {fileID: 425408388}
+  - {fileID: 915494412}
   m_Father: {fileID: 237895145}
-  m_RootOrder: 13
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1539523230
 GameObject:
@@ -4787,8 +4812,8 @@ Transform:
   - {fileID: 1992935635}
   - {fileID: 1125367887}
   - {fileID: 966251697}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 6
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1550492363
 GameObject:
@@ -5285,6 +5310,7 @@ GameObject:
   - component: {fileID: 1791870523}
   - component: {fileID: 1791870522}
   - component: {fileID: 1791870526}
+  - component: {fileID: 1791870527}
   m_Layer: 0
   m_Name: FrontDoor
   m_TagString: Untagged
@@ -5366,7 +5392,7 @@ Transform:
   m_LocalScale: {x: 0.60116, y: 4.0211973, z: 4.160251}
   m_Children: []
   m_Father: {fileID: 237895145}
-  m_RootOrder: 11
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!208 &1791870526
 NavMeshObstacle:
@@ -5384,6 +5410,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &1791870527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1791870521}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0c10ac6799f9aa40b7468b27da56d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isLocked: 1
 --- !u!4 &1796479289 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a5028766c6c2448878d200bb33de1f59, type: 3}
@@ -5480,14 +5519,14 @@ Transform:
   m_GameObject: {fileID: 1904932022}
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -3.21, y: 3.07, z: 23.05}
-  m_LocalScale: {x: 1.7624959, y: 2.2560432, z: 1.3648999}
+  m_LocalScale: {x: 1.7624959, y: 2.2560432, z: 1.3648998}
   m_Children:
   - {fileID: 764073187}
   - {fileID: 1088711496}
   - {fileID: 1934002880}
   - {fileID: 325310924}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 3
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1922895633
 GameObject:
@@ -5580,14 +5619,14 @@ Transform:
   m_GameObject: {fileID: 1922895633}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 16.942, y: 3.14, z: 23.54}
-  m_LocalScale: {x: 1.7624959, y: 2.2560432, z: 1.3648999}
+  m_LocalScale: {x: 1.7624959, y: 2.2560432, z: 1.3648998}
   m_Children:
   - {fileID: 731638314}
   - {fileID: 1254604861}
   - {fileID: 1285749802}
   - {fileID: 1256560712}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 5
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &1934002879
 GameObject:
@@ -5781,8 +5820,8 @@ Transform:
   - {fileID: 2130457086}
   - {fileID: 753548934}
   - {fileID: 1739719920}
-  m_Father: {fileID: 237895145}
-  m_RootOrder: 7
+  m_Father: {fileID: 1529524251}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1992935634
 GameObject:
@@ -5985,7 +6024,7 @@ GameObject:
   - component: {fileID: 2063104221}
   - component: {fileID: 2063104222}
   m_Layer: 0
-  m_Name: Holder
+  m_Name: Diamond
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

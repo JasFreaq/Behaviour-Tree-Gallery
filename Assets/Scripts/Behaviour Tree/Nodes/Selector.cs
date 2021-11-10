@@ -4,31 +4,42 @@ using UnityEngine;
 
 public class Selector : Node
 {
-    public Selector(string name)
+    public Selector(string name, int priority = 0)
     {
         _name = name;
+        _priority = priority;
+    }
+    
+    public Selector(string name, bool invert, int priority = 0)
+    {
+        _name = name;
+        _invert = invert;
+        _priority = priority;
     }
 
     public override Status Process()
     {
+        Status status = Status.Running;
         Status childStatus = base.Process();
 
         if (childStatus == Status.Success)
         {
             _currentChildIndex = 0;
-            return Status.Success;
+            status = Status.Success;
         }
-
-        if (childStatus == Status.Failure)
+        else if (childStatus == Status.Failure)
         {
             _currentChildIndex++;
             if (_currentChildIndex >= _childrenNodes.Count)
             {
                 _currentChildIndex = 0;
-                return Status.Failure;
+                status = Status.Failure;
             }
         }
 
-        return Status.Running;
+        if (_invert)
+            return InvertStatus(status);
+
+        return status;
     }
 }

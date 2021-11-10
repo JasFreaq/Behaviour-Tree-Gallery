@@ -3,96 +3,102 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
-public class RobberBehaviour : MonoBehaviour
+public class RobberBehaviour : BTAgent
 {
-    [SerializeField] private Transform _diamond;
-    [SerializeField] private Transform _frontdoor;
-    [SerializeField] private Transform _backdoor;
+    [Header("Robber")]
+    [SerializeField] private Door _frontdoor;
+    [SerializeField] private Door _backdoor;
+    [SerializeField] private Transform[] _itemsToSteal;
     [SerializeField] private Transform _van;
+    [SerializeField] [Range(0, 1000)] private int _money = 800;
 
-    [Header("Navigation")] 
-    [SerializeField] private float _destReachBuffer = 2f;
+    private Transform _currentStolenItem;
+    private int _stolenItemCounter;
 
-    private BehaviourTree _behaviourTree;
-    private NavMeshAgent _navAgent;
-
-    private ActionState _currentState = ActionState.Idle;
-    private Node.Status _treeStatus;
-
-    private void Awake()
+    protected override void Start()
     {
-        _behaviourTree = new BehaviourTree();
-
-        _navAgent = GetComponent<NavMeshAgent>();
-    }
-
-    void Start()
-    {
-        Selector operDoorSelector = new Selector("Open Door");
-        operDoorSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor));
-        operDoorSelector.AddChild(new Leaf("Move To Front Door", MoveToFrontdoor));
-
-        Sequence stealSequence = new Sequence("Steal Diamond");
-        stealSequence.AddChild(operDoorSelector);
-        stealSequence.AddChild(new Leaf("Move To Diamond", MoveToDiamond));
-        stealSequence.AddChild(operDoorSelector);
+        PrioritySelector operDoorPSelector = new PrioritySelector("Open Door");
+        operDoorPSelector.AddChild(new Leaf("Move To Front Door", MoveToFrontdoor, 1));
+        operDoorPSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor, 2));
+        
+        Sequence stealSequence = new Sequence("Steal Something");
+        stealSequence.AddChild(new Leaf("Has Money", HasMoney, true));
+        stealSequence.AddChild(operDoorPSelector);
+        stealSequence.AddChild(new Leaf("Move To Diamond", StealItem));
+        stealSequence.AddChild(operDoorPSelector);
         stealSequence.AddChild(new Leaf("Move To Van", MoveToVan));
 
-        _behaviourTree.AddChild(stealSequence);
+        _tree.AddChild(stealSequence);
 
-        //_behaviourTree.PrintTree();
-        _treeStatus = Node.Status.Running;
-    }
-
-    private void Update()
-    {
-        if (_treeStatus == Node.Status.Running)
-            _treeStatus = _behaviourTree.Process();
+        //_tree.PrintTree();
+        base.Start();
     }
     
-    private Node.Status MoveToDiamond()
+    private Node.Status HasMoney()
     {
-        return MoveToLocation(_diamond.position);
+        if (_money >= 500)
+            return Node.Status.Success;
+
+        return Node.Status.Failure;
+    }
+
+    private Node.Status StealItem()
+    {
+        int noOfItemsToSteal = _itemsToSteal.Length;
+        if (_stolenItemCounter < noOfItemsToSteal) 
+        {
+            while (_currentStolenItem == null)
+                _currentStolenItem = _itemsToSteal[Random.Range(0, noOfItemsToSteal)];
+
+            Node.Status status = MoveToLocation(_currentStolenItem.position);
+            if (status == Node.Status.Success)
+                _currentStolenItem.SetParent(transform);
+
+            return status;
+        }
+
+        return Node.Status.Failure;
     }
 
     private Node.Status MoveToFrontdoor()
     {
-        return MoveToLocation(_frontdoor.position);
+        return MoveToDoor(_frontdoor);
     }
     
     private Node.Status MoveToBackdoor()
     {
-        return MoveToLocation(_backdoor.position);
+        return MoveToDoor(_backdoor);
     }
 
     private Node.Status MoveToVan()
     {
-        return MoveToLocation(_van.position);
-    }
-    
-    private Node.Status MoveToLocation(Vector3 destination)
-    {
-        if (_currentState == ActionState.Idle)
+        Node.Status status = MoveToLocation(_van.position);
+        if (status == Node.Status.Success)
         {
-            _navAgent.SetDestination(destination);
-            _currentState = ActionState.Working;
+            Destroy(_currentStolenItem.gameObject);
+            _stolenItemCounter++;
+            //_money += 500;
         }
-        else
-        {
-            if (Vector3.Distance(_navAgent.pathEndPosition, destination) > _destReachBuffer)
-            {
-                _currentState = ActionState.Idle;
-                return Node.Status.Failure;
-            }
 
-            if (Vector3.Distance(destination, transform.position) <= _destReachBuffer)
+        return status;
+    }
+
+    private Node.Status MoveToDoor(Door door)
+    {
+        Node.Status status = MoveToLocation(door.transform.position);
+        if (status == Node.Status.Success)
+        {
+            if (!door.IsLocked)
             {
-                _currentState = ActionState.Idle;
+                door.gameObject.SetActive(false);
                 return Node.Status.Success;
             }
+
+            return Node.Status.Failure;
         }
 
-        return Node.Status.Running;
+        return status;
     }
 }

@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BehaviourTree : Node
+public class Tree : Node
 {
-    public BehaviourTree()
+    public Tree()
     {
-        _name = "Tree";
+        _name = "Tree Root";
     }
 
-    public BehaviourTree(string name)
+    public Tree(string name)
     {
         _name = name;
     }

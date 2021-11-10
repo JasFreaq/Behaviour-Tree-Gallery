@@ -1,0 +1,78 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public abstract class Node
+{
+    #region Associated Data Structure(s)
+
+    public enum Status
+    {
+        Failure,
+        Running,
+        Success
+    }
+
+    #endregion
+
+    protected List<Node> _childrenNodes = new List<Node>();
+    protected int _currentChildIndex;
+    protected int _priority;
+    protected bool _invert;
+
+    protected string _name;
+    
+    public Node() { }
+
+    public Node(string name, int priority = 0)
+    {
+        _name = name;
+        _priority = priority;
+    }
+
+    public Node(string name, bool invert, int priority = 0)
+    {
+        _name = name;
+        _invert = invert;
+        _priority = priority;
+    }
+
+    public IReadOnlyList<Node> ChildrenNodes
+    {
+        get { return _childrenNodes; }
+    }
+
+    public int Priority
+    {
+        get { return _priority; }
+    }
+
+    public string Name
+    {
+        get { return _name; }
+    }
+
+    public virtual void AddChild(Node child)
+    {
+        _childrenNodes.Add(child);
+    }
+
+    public virtual Status Process()
+    {
+        if (_childrenNodes.Count == 0)
+            return Status.Success;
+        
+        return _childrenNodes[_currentChildIndex].Process();
+    }
+
+    protected Status InvertStatus(Status status)
+    {
+        if (status == Status.Failure)
+            return Status.Success;
+
+        if (status == Status.Success)
+            return Status.Failure;
+
+        return Status.Running;
+    }
+}
