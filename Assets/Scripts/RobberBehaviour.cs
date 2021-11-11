@@ -26,7 +26,7 @@ public class RobberBehaviour : BTAgent
         Sequence stealSequence = new Sequence("Steal Something");
         stealSequence.AddChild(new Leaf("Has Money", HasMoney, true));
         stealSequence.AddChild(operDoorPSelector);
-        stealSequence.AddChild(new Leaf("Move To Diamond", StealItem));
+        stealSequence.AddChild(new Leaf("Steal Item", StealItem, _itemsToSteal.Length));
         stealSequence.AddChild(operDoorPSelector);
         stealSequence.AddChild(new Leaf("Move To Van", MoveToVan));
 
@@ -35,7 +35,13 @@ public class RobberBehaviour : BTAgent
         //_tree.PrintTree();
         base.Start();
     }
-    
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+            Time.timeScale = 10f;
+    }
+
     private Node.Status HasMoney()
     {
         if (_money >= 500)
@@ -44,13 +50,12 @@ public class RobberBehaviour : BTAgent
         return Node.Status.Failure;
     }
 
-    private Node.Status StealItem()
+    private Node.Status StealItem(int itemIndex)
     {
-        int noOfItemsToSteal = _itemsToSteal.Length;
-        if (_stolenItemCounter < noOfItemsToSteal) 
+        if (_stolenItemCounter < _itemsToSteal.Length && (_currentStolenItem || _itemsToSteal[itemIndex])) 
         {
-            while (_currentStolenItem == null)
-                _currentStolenItem = _itemsToSteal[Random.Range(0, noOfItemsToSteal)];
+            if (!_currentStolenItem)
+                _currentStolenItem = _itemsToSteal[itemIndex];
 
             Node.Status status = MoveToLocation(_currentStolenItem.position);
             if (status == Node.Status.Success)
@@ -58,7 +63,6 @@ public class RobberBehaviour : BTAgent
 
             return status;
         }
-
         return Node.Status.Failure;
     }
 

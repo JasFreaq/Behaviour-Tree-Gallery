@@ -65,6 +65,11 @@ public abstract class Node
         return _childrenNodes[_currentChildIndex].Process();
     }
 
+    public void ChangePriority(int newPriority)
+    {
+        _priority = newPriority;
+    }
+
     protected Status InvertStatus(Status status)
     {
         if (status == Status.Failure)
