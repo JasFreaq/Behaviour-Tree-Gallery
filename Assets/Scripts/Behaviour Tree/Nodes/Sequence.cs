@@ -4,18 +4,9 @@ using UnityEngine;
 
 public class Sequence : Node
 {
-    public Sequence(string name, int priority = 0)
-    {
-        _name = name;
-        _priority = priority;
-    }
+    public Sequence(string name, float priority = 0) : base(name, priority) { }
     
-    public Sequence(string name, bool invert, int priority = 0)
-    {
-        _name = name;
-        _invert = invert;
-        _priority = priority;
-    }
+    public Sequence(string name, bool invert, float priority = 0) : base(name, invert, priority) { }
 
     public override Status Process()
     {

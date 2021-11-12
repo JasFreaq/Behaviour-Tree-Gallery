@@ -19,9 +19,9 @@ public class RobberBehaviour : BTAgent
 
     protected override void Start()
     {
-        PrioritySelector operDoorPSelector = new PrioritySelector("Open Door");
-        operDoorPSelector.AddChild(new Leaf("Move To Front Door", MoveToFrontdoor, 1));
-        operDoorPSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor, 2));
+        PrioritySelector operDoorPSelector = new PrioritySelector("Open Door", true);
+        operDoorPSelector.AddChild(new Leaf("Move To Front Door", MoveToFrontdoor, 2));
+        operDoorPSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor, 1));
         
         Sequence stealSequence = new Sequence("Steal Something");
         stealSequence.AddChild(new Leaf("Has Money", HasMoney, true));
@@ -39,7 +39,7 @@ public class RobberBehaviour : BTAgent
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
-            Time.timeScale = 10f;
+            Time.timeScale = 2.5f;
     }
 
     private Node.Status HasMoney()
@@ -83,7 +83,7 @@ public class RobberBehaviour : BTAgent
         {
             Destroy(_currentStolenItem.gameObject);
             _stolenItemCounter++;
-            //_money += 500;
+            _money += 500;
         }
 
         return status;
@@ -96,7 +96,7 @@ public class RobberBehaviour : BTAgent
         {
             if (!door.IsLocked)
             {
-                door.gameObject.SetActive(false);
+                door.OpenDoor();
                 return Node.Status.Success;
             }
 

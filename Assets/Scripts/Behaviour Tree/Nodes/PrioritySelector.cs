@@ -2,34 +2,132 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PrioritySelector : Selector
+public class PrioritySelector : Node
 {
+    #region Helper Data Structure(s)
+
+    struct PriorityAdjustment
+    {
+        public bool adjusted;
+        public Status status;
+    }
+
+    #endregion
+
     private bool _nodesAreSorted;
+    private bool _adjustPriorityDynamically;
 
-    public PrioritySelector(string name, int priority = 0) : base(name, priority) { }
+    private Dictionary<Node, PriorityAdjustment> _priorityAdjustments;
 
-    public PrioritySelector(string name, bool invert, int priority = 0) : base(name, invert, priority)
-    { }
+    public PrioritySelector(string name, bool adjustPriorityDynamically, float priority = 0)
+        : base(name, priority)
+    {
+        _adjustPriorityDynamically = adjustPriorityDynamically;
+        if (_adjustPriorityDynamically)
+            _priorityAdjustments = new Dictionary<Node, PriorityAdjustment>();
+    }
+
+    public PrioritySelector(string name, bool adjustPriorityDynamically, bool invert, float priority = 0)
+        : base(name, invert, priority)
+    {
+        _adjustPriorityDynamically = adjustPriorityDynamically;
+        if (_adjustPriorityDynamically)
+            _priorityAdjustments = new Dictionary<Node, PriorityAdjustment>();
+    }
 
     public override void AddChild(Node child)
     {
+        if (_adjustPriorityDynamically) 
+        {
+            foreach (Node childNode in _childrenNodes)
+            {
+                PriorityAdjustment adjustment = _priorityAdjustments[childNode];
+                adjustment.adjusted = false;
+                _priorityAdjustments[childNode] = adjustment;
+            }
+
+            _priorityAdjustments.Add(child, new PriorityAdjustment());
+        }
+        
         base.AddChild(child);
+
         _nodesAreSorted = false;
     }
 
     private void OrderNodes()
     {
-        if (!_nodesAreSorted)
+        Sort(_childrenNodes, 0, _childrenNodes.Count - 1);
+        _nodesAreSorted = true;
+    }
+
+    private bool AdjustPriority(Node childNode, Status checkStatus)
+    {
+        bool changed = false;
+
+        if (_adjustPriorityDynamically && checkStatus != Status.Running) 
         {
-            Sort(_childrenNodes, 0, _childrenNodes.Count - 1);
-            _nodesAreSorted = true;
+            PriorityAdjustment adjustment = _priorityAdjustments[childNode];
+            if (!adjustment.adjusted || adjustment.status != checkStatus)
+            {
+                adjustment.adjusted = true;
+                adjustment.status = checkStatus;
+
+                if (checkStatus == Status.Success)
+                    childNode.ChangePriority(childNode.Priority * 10);
+                else if (checkStatus == Status.Failure)
+                    childNode.ChangePriority(childNode.Priority / 10);
+
+                changed = true;
+            }
+
+            _priorityAdjustments[childNode] = adjustment;
         }
+
+        return changed;
     }
 
     public override Status Process()
     {
-        OrderNodes();
-        return base.Process();
+        string debug = "";
+        foreach (Node childrenNode in _childrenNodes)
+        {
+            debug += $"{childrenNode.Name} - {childrenNode.Priority}\n";
+        }
+        Debug.Log(debug);
+
+        if (!_nodesAreSorted)
+            OrderNodes();
+
+        Status status = Status.Running;
+        Status childStatus = base.Process();
+        bool priorityChanged = false;
+
+        if (childStatus == Status.Success)
+        {
+            priorityChanged = AdjustPriority(_childrenNodes[_currentChildIndex], Status.Success);
+
+            _currentChildIndex = 0;
+            status = Status.Success;
+        }
+        else if (childStatus == Status.Failure)
+        {
+            priorityChanged = AdjustPriority(_childrenNodes[_currentChildIndex], Status.Failure);
+
+            _currentChildIndex++;
+            if (_currentChildIndex >= _childrenNodes.Count)
+            {
+                _currentChildIndex = 0;
+                status = Status.Failure;
+            }
+        }
+
+        if (priorityChanged) 
+            OrderNodes();
+
+        if (_invert)
+            return InvertStatus(status);
+
+        return status;
     }
 
     private static int Partition(List<Node> nodes, int low, int high)

@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Selector : Node
 {
-    public Selector(string name, int priority = 0)
+    public Selector(string name, float priority = 0)
     {
         _name = name;
         _priority = priority;
     }
     
-    public Selector(string name, bool invert, int priority = 0)
+    public Selector(string name, bool invert, float priority = 0)
     {
         _name = name;
         _invert = invert;

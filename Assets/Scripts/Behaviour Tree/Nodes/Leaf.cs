@@ -15,36 +15,29 @@ public class Leaf : Node
 
     public Leaf() { }
 
-    public Leaf(string name, Func<Status> tickProcess, int priority = 0)
+    public Leaf(string name, Func<Status> tickProcess, float priority = 0) : base(name, priority)
     {
-        _name = name;
         _tickProcess = tickProcess;
-        _priority = priority;
     }
     
-    public Leaf(string name, Func<Status> tickProcess, bool invert, int priority = 0)
+    public Leaf(string name, Func<Status> tickProcess, bool invert, float priority = 0) 
+        : base(name, invert, priority)
     {
-        _name = name;
         _tickProcess = tickProcess;
-        _invert = invert;
-        _priority = priority;
     }
     
-    public Leaf(string name, Func<int, Status> tickProcessList, int processIndexLimit, int priority = 0)
+    public Leaf(string name, Func<int, Status> tickProcessList, int processIndexLimit, float priority = 0)
+        : base(name, priority)
     {
-        _name = name;
         _tickProcessList = tickProcessList;
         _processIndexLimit = processIndexLimit;
-        _priority = priority;
     }
     
-    public Leaf(string name, Func<int, Status> tickProcessList, int processIndexLimit, bool invert, int priority = 0)
+    public Leaf(string name, Func<int, Status> tickProcessList, int processIndexLimit, bool invert, float priority = 0)
+        : base(name, invert, priority)
     {
-        _name = name;
         _tickProcessList = tickProcessList;
         _processIndexLimit = processIndexLimit;
-        _invert = invert;
-        _priority = priority;
     }
 
     #endregion

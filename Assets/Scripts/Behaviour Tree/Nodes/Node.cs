@@ -8,8 +8,8 @@ public abstract class Node
 
     public enum Status
     {
-        Failure,
         Running,
+        Failure,
         Success
     }
 
@@ -17,20 +17,20 @@ public abstract class Node
 
     protected List<Node> _childrenNodes = new List<Node>();
     protected int _currentChildIndex;
-    protected int _priority;
+    protected float _priority;
     protected bool _invert;
 
     protected string _name;
     
     public Node() { }
 
-    public Node(string name, int priority = 0)
+    public Node(string name, float priority = 0)
     {
         _name = name;
         _priority = priority;
     }
 
-    public Node(string name, bool invert, int priority = 0)
+    public Node(string name, bool invert, float priority = 0)
     {
         _name = name;
         _invert = invert;
@@ -42,7 +42,7 @@ public abstract class Node
         get { return _childrenNodes; }
     }
 
-    public int Priority
+    public float Priority
     {
         get { return _priority; }
     }
@@ -65,7 +65,7 @@ public abstract class Node
         return _childrenNodes[_currentChildIndex].Process();
     }
 
-    public void ChangePriority(int newPriority)
+    public void ChangePriority(float newPriority)
     {
         _priority = newPriority;
     }
