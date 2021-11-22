@@ -88,13 +88,6 @@ public class PrioritySelector : Node
 
     public override Status Process()
     {
-        string debug = "";
-        foreach (Node childrenNode in _childrenNodes)
-        {
-            debug += $"{childrenNode.Name} - {childrenNode.Priority}\n";
-        }
-        Debug.Log(debug);
-
         if (!_nodesAreSorted)
             OrderNodes();
 
@@ -106,7 +99,7 @@ public class PrioritySelector : Node
         {
             priorityChanged = AdjustPriority(_childrenNodes[_currentChildIndex], Status.Success);
 
-            _currentChildIndex = 0;
+            Reset();
             status = Status.Success;
         }
         else if (childStatus == Status.Failure)

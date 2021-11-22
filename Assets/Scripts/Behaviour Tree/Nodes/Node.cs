@@ -70,6 +70,14 @@ public abstract class Node
         _priority = newPriority;
     }
 
+    public void Reset()
+    {
+        foreach(Node node in _childrenNodes)
+            node.Reset();
+
+        _currentChildIndex = 0;
+    }
+
     protected Status InvertStatus(Status status)
     {
         if (status == Status.Failure)

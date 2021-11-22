@@ -24,7 +24,7 @@ public class Selector : Node
 
         if (childStatus == Status.Success)
         {
-            _currentChildIndex = 0;
+            Reset();
             status = Status.Success;
         }
         else if (childStatus == Status.Failure)

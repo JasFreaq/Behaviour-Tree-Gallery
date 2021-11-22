@@ -64,4 +64,26 @@ public abstract class BTAgent : MonoBehaviour
 
         return Node.Status.Running;
     }
+
+    protected Node.Status CanSee(Vector3 target, string targetTag, float distance, float maxAngle)
+    {
+        Vector3 directionToTarget = target - transform.position;
+        float angle = Vector3.Angle(directionToTarget, transform.forward);
+
+        if (directionToTarget.magnitude <= distance || angle <= maxAngle)
+        {
+            if (Physics.Raycast(transform.position, directionToTarget, out RaycastHit hit))
+            {
+                if (hit.collider.gameObject.CompareTag(targetTag))
+                    return Node.Status.Success;
+            }
+        }
+
+        return Node.Status.Failure;
+    }
+
+    protected Node.Status Flee(Vector3 location, float distance)
+    {
+        return MoveToLocation(transform.position + (transform.position - location).normalized * distance);
+    }
 }

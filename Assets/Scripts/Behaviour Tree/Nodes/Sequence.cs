@@ -15,7 +15,7 @@ public class Sequence : Node
 
         if (childStatus == Status.Failure)
         {
-            _currentChildIndex = 0;
+            Reset();
             status = Status.Failure;
         }
         else if (childStatus == Status.Success)

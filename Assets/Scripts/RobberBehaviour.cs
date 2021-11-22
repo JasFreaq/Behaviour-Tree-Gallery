@@ -12,6 +12,10 @@ public class RobberBehaviour : BTAgent
     [SerializeField] private Door _backdoor;
     [SerializeField] private Transform[] _itemsToSteal;
     [SerializeField] private Transform _van;
+    [SerializeField] private Transform _cop;
+    [SerializeField] private float _copDetectDistance = 50f;
+    [SerializeField] private float _copDetectAngle = 60f;
+    [SerializeField] private float _fleeDistance = 75f;
     [SerializeField] [Range(0, 1000)] private int _money = 800;
 
     private Transform _currentStolenItem;
@@ -23,14 +27,29 @@ public class RobberBehaviour : BTAgent
         operDoorPSelector.AddChild(new Leaf("Move To Front Door", MoveToFrontdoor, 2));
         operDoorPSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor, 1));
         
-        Sequence stealSequence = new Sequence("Steal Something");
-        stealSequence.AddChild(new Leaf("Has Money", HasMoney, true));
+        Sequence stealDepSequence = new Sequence("Steal Dependancy");
+        stealDepSequence.AddChild(new Leaf("Has No Money", HasMoney, true));
+        stealDepSequence.AddChild(new Leaf("Can't See Cop", CanSeeCop, true));
+
+        DepSequence stealSequence = new DepSequence("Steal Something", stealDepSequence, _navAgent);
+        stealSequence.AddChild(new Leaf("Has No Money", HasMoney, true));
         stealSequence.AddChild(operDoorPSelector);
         stealSequence.AddChild(new Leaf("Steal Item", StealItem, _itemsToSteal.Length));
-        stealSequence.AddChild(operDoorPSelector);
         stealSequence.AddChild(new Leaf("Move To Van", MoveToVan));
 
-        _tree.AddChild(stealSequence);
+        Selector stealSelector = new Selector("Steal Selection");
+        stealSelector.AddChild(stealSequence);
+        stealSelector.AddChild(new Leaf("Move To Van", MoveToVan));
+
+        Sequence bewareCopSequence = new Sequence("Beware Of Cop");
+        bewareCopSequence.AddChild(new Leaf("Can See Cop", CanSeeCop));
+        bewareCopSequence.AddChild(new Leaf("Flee From Cop", FleeFromCop));
+
+        Selector baseSelector = new Selector("Base Selector");
+        baseSelector.AddChild(bewareCopSequence);
+        baseSelector.AddChild(stealSelector);
+
+        _tree.AddChild(baseSelector);
 
         //_tree.PrintTree();
         base.Start();
@@ -104,5 +123,15 @@ public class RobberBehaviour : BTAgent
         }
 
         return status;
+    }
+
+    private Node.Status CanSeeCop()
+    {
+        return CanSee(_cop.transform.position, "Cop", _copDetectDistance, _copDetectAngle);
+    }
+
+    private Node.Status FleeFromCop()
+    {
+        return Flee(_cop.transform.position, _fleeDistance);
     }
 }
