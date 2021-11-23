@@ -8,8 +8,8 @@ using Random = UnityEngine.Random;
 public class RobberBehaviour : BTAgent
 {
     [Header("Robber")]
-    [SerializeField] private Door _frontdoor;
-    [SerializeField] private Door _backdoor;
+    [SerializeField] private Transform _frontdoor;
+    [SerializeField] private Transform _backdoor;
     [SerializeField] private Transform[] _itemsToSteal;
     [SerializeField] private Transform _van;
     [SerializeField] private Transform _cop;
@@ -17,9 +17,11 @@ public class RobberBehaviour : BTAgent
     [SerializeField] private float _copDetectAngle = 60f;
     [SerializeField] private float _fleeDistance = 75f;
     [SerializeField] [Range(0, 1000)] private int _money = 800;
+    [SerializeField] private int _moneyDecrement = 50;
 
     private Transform _currentStolenItem;
     private int _stolenItemCounter;
+    private Coroutine _moneyDecrementRoutine;
 
     protected override void Start()
     {
@@ -32,7 +34,6 @@ public class RobberBehaviour : BTAgent
         stealDepSequence.AddChild(new Leaf("Can't See Cop", CanSeeCop, true));
 
         DepSequence stealSequence = new DepSequence("Steal Something", stealDepSequence, _navAgent);
-        stealSequence.AddChild(new Leaf("Has No Money", HasMoney, true));
         stealSequence.AddChild(operDoorPSelector);
         stealSequence.AddChild(new Leaf("Steal Item", StealItem, _itemsToSteal.Length));
         stealSequence.AddChild(new Leaf("Move To Van", MoveToVan));
@@ -53,6 +54,7 @@ public class RobberBehaviour : BTAgent
 
         //_tree.PrintTree();
         base.Start();
+        _moneyDecrementRoutine = StartCoroutine(DecreaseMoneyRoutine());
     }
 
     private void Update()
@@ -71,6 +73,12 @@ public class RobberBehaviour : BTAgent
 
     private Node.Status StealItem(int itemIndex)
     {
+        if (_moneyDecrementRoutine != null)
+        {
+            StopCoroutine(_moneyDecrementRoutine);
+            _moneyDecrementRoutine = null;
+        }
+
         if (_stolenItemCounter < _itemsToSteal.Length && (_currentStolenItem || _itemsToSteal[itemIndex])) 
         {
             if (!_currentStolenItem)
@@ -87,39 +95,25 @@ public class RobberBehaviour : BTAgent
 
     private Node.Status MoveToFrontdoor()
     {
-        return MoveToDoor(_frontdoor);
+        return MoveToLocation(_frontdoor.position);
     }
     
     private Node.Status MoveToBackdoor()
     {
-        return MoveToDoor(_backdoor);
+        return MoveToLocation(_backdoor.position);
     }
 
     private Node.Status MoveToVan()
     {
         Node.Status status = MoveToLocation(_van.position);
-        if (status == Node.Status.Success)
+        if (status == Node.Status.Success && _currentStolenItem)
         {
+            if (_moneyDecrementRoutine == null)
+                _moneyDecrementRoutine = StartCoroutine(DecreaseMoneyRoutine());
+
             Destroy(_currentStolenItem.gameObject);
             _stolenItemCounter++;
             _money += 500;
-        }
-
-        return status;
-    }
-
-    private Node.Status MoveToDoor(Door door)
-    {
-        Node.Status status = MoveToLocation(door.transform.position);
-        if (status == Node.Status.Success)
-        {
-            if (!door.IsLocked)
-            {
-                door.OpenDoor();
-                return Node.Status.Success;
-            }
-
-            return Node.Status.Failure;
         }
 
         return status;
@@ -133,5 +127,14 @@ public class RobberBehaviour : BTAgent
     private Node.Status FleeFromCop()
     {
         return Flee(_cop.transform.position, _fleeDistance);
+    }
+
+    private IEnumerator DecreaseMoneyRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1f);
+            _money = Mathf.Max(0, _money - _moneyDecrement);
+        }
     }
 }
