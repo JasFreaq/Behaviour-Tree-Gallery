@@ -32,7 +32,7 @@ public class Selector : Node
             _currentChildIndex++;
             if (_currentChildIndex >= _childrenNodes.Count)
             {
-                _currentChildIndex = 0;
+                Reset();
                 status = Status.Failure;
             }
         }

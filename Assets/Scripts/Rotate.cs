@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Rotate : MonoBehaviour
 {
-    // Update is called once per frame
+    [SerializeField] private Vector3 _rotation = new Vector3(0, 30, 0);
+
     void Update()
     {
-        this.transform.Rotate(0, 2, 0);
+        transform.Rotate(_rotation * Time.deltaTime);
     }
 }

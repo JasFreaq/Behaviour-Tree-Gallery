@@ -30,6 +30,7 @@ public class RobberBehaviour : BTAgent
         operDoorPSelector.AddChild(new Leaf("Move To Backdoor", MoveToBackdoor, 1));
         
         Sequence stealDepSequence = new Sequence("Steal Dependancy");
+        stealDepSequence.AddChild(new Leaf("Is Gallery Closed", Blackboard.Instance.IsGalleryOpen, true));
         stealDepSequence.AddChild(new Leaf("Has No Money", HasMoney, true));
         stealDepSequence.AddChild(new Leaf("Can't See Cop", CanSeeCop, true));
 
@@ -56,13 +57,7 @@ public class RobberBehaviour : BTAgent
         base.Start();
         _moneyDecrementRoutine = StartCoroutine(DecreaseMoneyRoutine());
     }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.T))
-            Time.timeScale = 2.5f;
-    }
-
+    
     private Node.Status HasMoney()
     {
         if (_money >= 500)

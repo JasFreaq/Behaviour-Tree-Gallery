@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class PatronBehaviour : BTAgent
 {
-    [Header("Robber")]
+    [Header("Patron")]
     [SerializeField] private Transform _frontdoor;
     [SerializeField] private Transform _base;
     [SerializeField] private Transform[] _artworks;
     [SerializeField] private float _boredomIncrement = 50f;
+
+    private bool _hasTicket, _inQueue;
 
     private float _boredom;
     private Coroutine _boredomIncrementRoutine;
@@ -16,16 +18,25 @@ public class PatronBehaviour : BTAgent
 
     private float _currentBoredomLowerBound;
     private Transform _currentArt;
-
+    
     protected override void Start()
     {
-        Sequence visitSequence = new Sequence("Visit Gallery");
+        Sequence enterGallerySequence = new Sequence("Enter Gallery");
+        enterGallerySequence.AddChild(new Leaf("Has Ticket", PossesesTicket));
+        enterGallerySequence.AddChild(new Leaf("Move To Art", MoveToArt, _artworks.Length));
+        enterGallerySequence.AddChild(new Leaf("Look At Art", LookAtArt));
+        enterGallerySequence.AddChild(new Leaf("Move To Base", MoveToBase));
+
+        Selector enterGallerySelector = new Selector("Enter Gallery Selector");
+        enterGallerySelector.AddChild(enterGallerySequence);
+        enterGallerySelector.AddChild(new Leaf("Is Waiting", IsWaiting));
+
+        DepSequence visitSequence = new DepSequence("Visit Gallery",
+            new Leaf("Is Gallery Open", Blackboard.Instance.IsGalleryOpen), _navAgent);
         visitSequence.AddChild(new Leaf("Is Bored", IsBored));
         visitSequence.AddChild(new Leaf("Move to Frontdoor", MoveToFrontdoor));
-        visitSequence.AddChild(new Leaf("Move To Art", MoveToArt, _artworks.Length));
-        visitSequence.AddChild(new Leaf("Look At Art", LookAtArt));
-        visitSequence.AddChild(new Leaf("Move To Base", MoveToBase));
-        
+        visitSequence.AddChild(enterGallerySelector);
+
         Selector decisionSelector = new Selector("Decision Selector");
         decisionSelector.AddChild(visitSequence);
         decisionSelector.AddChild(new Leaf("Move To Base", MoveToBase));
@@ -35,6 +46,28 @@ public class PatronBehaviour : BTAgent
 
         _boredom = Random.Range(0, 25) * 20f;
         _boredomIncrementRoutine = StartCoroutine(IncreaseBoredomRoutine());
+    }
+
+    private Node.Status PossesesTicket()
+    {
+        if (_hasTicket)
+            return Node.Status.Success;
+
+        return Node.Status.Failure;
+    }
+
+    private Node.Status IsWaiting()
+    {
+        if (!_inQueue && !_hasTicket) 
+        {
+            Blackboard.Instance.RegisterPatron(this);
+            _inQueue = true;
+        }
+
+        //if (_inQueue)
+            return Node.Status.Success;
+
+        //return Node.Status.Failure;
     }
     
     private Node.Status IsBored()
@@ -93,6 +126,7 @@ public class PatronBehaviour : BTAgent
         {
             if (_boredomIncrementRoutine == null)
                 _boredomIncrementRoutine = StartCoroutine(IncreaseBoredomRoutine());
+            _hasTicket = false;
         }
 
         return status;
@@ -114,5 +148,11 @@ public class PatronBehaviour : BTAgent
             yield return new WaitForSeconds(1f);
             _boredom -= _boredomIncrement;
         }
+    }
+
+    public void GiveTicket()
+    {
+        _hasTicket = true;
+        _inQueue = false;
     }
 }
