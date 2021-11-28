@@ -15,8 +15,9 @@ public abstract class BTAgent : MonoBehaviour
 
     protected BTAgentState _currentState = BTAgentState.Idle;
     protected Node.Status _treeStatus;
-
+    
     private WaitForSeconds _updateWaitForSeconds;
+    private Vector3 _chaseLocation;
 
     private void Awake()
     {
@@ -65,12 +66,13 @@ public abstract class BTAgent : MonoBehaviour
         return Node.Status.Running;
     }
 
-    protected Node.Status CanSee(Vector3 target, string targetTag, float distance, float maxAngle)
+    protected Node.Status CanSee(Vector3 target, string targetTag, float maxDistance, float minDistance, float maxAngle)
     {
         Vector3 directionToTarget = target - transform.position;
         float angle = Vector3.Angle(directionToTarget, transform.forward);
 
-        if (directionToTarget.magnitude <= distance || angle <= maxAngle)
+        if (directionToTarget.magnitude <= minDistance ||
+            directionToTarget.magnitude <= maxDistance && angle <= maxAngle) 
         {
             if (Physics.Raycast(transform.position, directionToTarget, out RaycastHit hit))
             {
@@ -85,5 +87,13 @@ public abstract class BTAgent : MonoBehaviour
     protected Node.Status Flee(Vector3 location, float distance)
     {
         return MoveToLocation(transform.position + (transform.position - location).normalized * distance);
+    }
+    
+    protected Node.Status Chase(Vector3 location, float distance)
+    {
+        if (_currentState == BTAgentState.Idle)
+            _chaseLocation = transform.position - (transform.position - location).normalized * distance;
+
+        return MoveToLocation(_chaseLocation);
     }
 }

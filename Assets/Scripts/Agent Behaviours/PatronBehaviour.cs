@@ -23,7 +23,7 @@ public class PatronBehaviour : BTAgent
     {
         Sequence enterGallerySequence = new Sequence("Enter Gallery");
         enterGallerySequence.AddChild(new Leaf("Has Ticket", PossesesTicket));
-        enterGallerySequence.AddChild(new Leaf("Move To Art", MoveToArt, _artworks.Length));
+        enterGallerySequence.AddChild(new Leaf("Move To Art", MoveToArt, true, _artworks.Length));
         enterGallerySequence.AddChild(new Leaf("Look At Art", LookAtArt));
         enterGallerySequence.AddChild(new Leaf("Move To Base", MoveToBase));
 

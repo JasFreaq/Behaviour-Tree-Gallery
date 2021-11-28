@@ -13,9 +13,10 @@ public class RobberBehaviour : BTAgent
     [SerializeField] private Transform[] _itemsToSteal;
     [SerializeField] private Transform _van;
     [SerializeField] private Transform _cop;
-    [SerializeField] private float _copDetectDistance = 50f;
+    [SerializeField] private float _copDetectMaxDistance = 10f;
+    [SerializeField] private float _copDetectMinDistance = 5f;
     [SerializeField] private float _copDetectAngle = 60f;
-    [SerializeField] private float _fleeDistance = 75f;
+    [SerializeField] private float _fleeDistance = 15f;
     [SerializeField] [Range(0, 1000)] private int _money = 800;
     [SerializeField] private int _moneyDecrement = 50;
 
@@ -36,7 +37,7 @@ public class RobberBehaviour : BTAgent
 
         DepSequence stealSequence = new DepSequence("Steal Something", stealDepSequence, _navAgent);
         stealSequence.AddChild(operDoorPSelector);
-        stealSequence.AddChild(new Leaf("Steal Item", StealItem, _itemsToSteal.Length));
+        stealSequence.AddChild(new Leaf("Steal Item", StealItem, true, _itemsToSteal.Length));
         stealSequence.AddChild(new Leaf("Move To Van", MoveToVan));
 
         Selector stealSelector = new Selector("Steal Selection");
@@ -116,7 +117,7 @@ public class RobberBehaviour : BTAgent
 
     private Node.Status CanSeeCop()
     {
-        return CanSee(_cop.transform.position, "Cop", _copDetectDistance, _copDetectAngle);
+        return CanSee(_cop.transform.position, "Cop", _copDetectMaxDistance, _copDetectMinDistance, _copDetectAngle);
     }
 
     private Node.Status FleeFromCop()
